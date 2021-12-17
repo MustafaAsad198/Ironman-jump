@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ironman Jump</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+      
+
+        body {
+            background-color:whitesmoke;
+            overflow: hidden;
+        }
+
+        .c {
+            background-image: url(warzone.jpg);
+            background-repeat: no-repeat;
+            background-size: 100vw 100vh;
+            width: 100vw;
+            height: 100vh;
+           
+        }
+
+        .over {
+            position: relative;
+            text-align: center;
+            top: 23%;
+            margin: auto;
+            background-color: blue;
+            width: fit-content;
+            height: 45px;
+            font-size:xx-large;
+            font-family:  'Ubuntu', sans-serif;;
+            color: cornsilk;
+            padding: 5px;
+            border: 3px solid red;
+        }
+        #score{
+            background-color: lavender;
+            margin: auto;
+            width: fit-content;
+            height: 50px;
+            padding: 5px;
+            position: relative;
+            top: -1%;
+            border: 8px ridge black;
+            font-size: 40px;
+            font-family: 'Ubuntu', sans-serif;
+            border-radius: 15px;
+        }
+
+        .im {
+            background-image: url(ironman.png);
+            background-repeat: no-repeat;
+            width: 165px;
+            height: 300px;
+            background-size: cover;
+            position: absolute;
+            bottom: 0%;
+            left: 52px;
+            
+        }
+        .imdead{
+            animation: dead .5s ease-in-out reverse;
+            transform-origin: bottom;
+        }
+        .obs {
+            background-image: url(fire.png);
+            background-size: cover;
+            width: 200px;
+            height: 200px;
+            position: absolute;
+            bottom: 0%;
+            left: 50vw;
+        }
+
+        .obsani {
+            animation: obsani 3s linear infinite;
+        }
+
+        .animeim {
+            animation: anim linear .8s;
+        }
+
+        @keyframes anim {
+            0% {
+                bottom: 0;
+            }
+
+            50% {
+                bottom: 350px;
+            }
+
+            100% {
+                bottom: 0;
+            }
+        }
+
+        @keyframes obsani {
+            0% {
+                left: 100vw;
+            }
+
+            100% {
+                left: -10vw;
+            }
+        }
+        @keyframes dead {
+            0%{
+                transform: rotate(-.25turn);
+            }
+        }
+        .flip{
+            transform: rotateY(180deg);
+        }
+       
+    </style>
+</head>
+
+<body>
+    <div class="c">
+        <div class="over">Welcome to Ironman Jump game! Can you save Tony throughout the whole track?</div>
+        <div class="im"></div>
+        <div id="score"><b>Score : 0</b></div>
+        <div class="obs obsani"></div>
+        
+    </div>
+
+</body>
+<script>
+    audioend=new Audio('explosion.mp3');
+    audio=new Audio('avengersmusic.mp3');
+    setTimeout(() => {
+        audio.play();
+    }, 1000);
+    s = 0;
+    cross = true
+    document.onkeydown = function (e) {
+        console.log("key code is", e.keyCode);
+        if (e.keyCode == 38) {
+            im = document.querySelector('.im');
+            im.classList.add('animeim');
+            setTimeout(() => {
+                im.classList.remove('animeim');
+            }, 800);
+        }
+        if (e.keyCode == 39) {
+            im = document.querySelector('.im');
+            im.classList.remove('flip');
+            imx = parseInt(window.getComputedStyle(im, null).getPropertyValue('left'));
+            im.style.left = imx + 120 + "px";
+        }
+        if (e.keyCode == 37) {
+            im = document.querySelector('.im');
+            im.classList.add('flip');
+            imx = parseInt(window.getComputedStyle(im, null).getPropertyValue('left'));
+            im.style.left = (imx - 120) + "px";
+        }
+    }
+    setInterval(() => {
+        im = document.querySelector('.im');
+        gameover = document.querySelector('.over');
+        obs = document.querySelector('.obs');
+        dx = parseInt(window.getComputedStyle(im, null).getPropertyValue('left'));
+        dy = parseInt(window.getComputedStyle(im, null).getPropertyValue('top'));
+        ox = parseInt(window.getComputedStyle(obs, null).getPropertyValue('left'));
+        oy = parseInt(window.getComputedStyle(obs, null).getPropertyValue('top'));
+        osx = Math.abs(dx - ox);
+        osy = Math.abs(dy - oy);
+        // console.log(osx, osy);
+        if (osx < 73 && osy < 101) {
+           
+            gameover.innerHTML="Game Over! Reload to play again!";
+            obs.classList.remove('obsani');
+            audio.pause();
+            audioend.play();
+            im.classList.add('imdead');
+            
+            setTimeout(() => {
+                audioend.pause();
+                
+            }, 3000);
+        }
+        else if (osx < 100 && cross) {
+            s += 10;
+            updatesc(s);
+            cross = false;
+            setTimeout(() => {
+                cross = true;
+            }, 1000);
+            setTimeout(() => {
+                anidur = parseFloat(window.getComputedStyle(obs, null).getPropertyValue('animation-duration'));
+                newdur = anidur - 0.1;
+                console.log(newdur);
+                if(newdur>1.9)
+                obs.style.animationDuration = newdur + 's';
+            }, 500);
+            if(s==170||s==300)
+            {
+                let las=new Audio('laser.mp3');
+                
+                    setTimeout(() => {
+                        im.style.visibility='hidden';
+                        obs.style.visibility='hidden';
+                        setTimeout(() => {
+                            las.play();
+                        }, 100);
+                        las.pause();
+                    }, 500);
+                    setTimeout(() => {
+                        im.style.visibility='visible';
+                        obs.style.visibility='visible';
+                                   
+                     }, 1000);
+                    setTimeout(() => {
+                        im.style.visibility='hidden';
+                        obs.style.visibility='hidden';
+                        setTimeout(() => {
+                            las.play();
+                        }, 100);
+                        las.pause();
+                    }, 1500);
+                    setTimeout(() => {
+                        im.style.visibility='visible';
+                        obs.style.visibility='visible';
+                        
+                    }, 2000);
+                    setTimeout(() => {
+                        im.style.visibility='hidden';
+                        obs.style.visibility='hidden';
+                        setTimeout(() => {
+                            las.play();
+                        }, 100);
+                        las.pause();
+                    }, 2500);
+                    setTimeout(() => {
+                        im.style.visibility='visible';
+                        obs.style.visibility='visible';
+                        
+                    }, 3000);
+                    setTimeout(() => {
+                        im.style.visibility='hidden';
+                        obs.style.visibility='hidden';
+                        setTimeout(() => {
+                            las.play();
+                        }, 100);
+                        las.pause();
+                    }, 3500);
+                    setTimeout(() => {
+                        im.style.visibility='visible';
+                        obs.style.visibility='visible';
+                        
+                    }, 4000);
+                    setTimeout(() => {
+                        im.style.visibility='hidden';
+                        obs.style.visibility='hidden';
+                        setTimeout(() => {
+                            las.play();
+                        }, 100);
+                        las.pause();
+                    }, 4500);
+                    setTimeout(() => {
+                        im.style.visibility='visible';
+                        obs.style.visibility='visible';
+                        
+                    }, 5000);
+
+                    setTimeout(() => {
+                        im.style.visibility='hidden';
+                        obs.style.visibility='hidden';
+                        setTimeout(() => {
+                            las.play();
+                        }, 100);
+                        las.pause();
+                    }, 5500);
+                    setTimeout(() => {
+                        im.style.visibility='visible';
+                        obs.style.visibility='visible';
+                       
+                    }, 6000);
+                    setTimeout(() => {
+                        im.style.visibility='hidden';
+                        obs.style.visibility='hidden';
+                        setTimeout(() => {
+                            las.play();
+                        }, 100);
+                        las.pause();
+                    }, 6500);
+                    setTimeout(() => {
+                        im.style.visibility='visible';
+                        obs.style.visibility='visible';
+                       
+                    }, 7000);
+                    setTimeout(() => {
+                        im.style.visibility='hidden';
+                        obs.style.visibility='hidden';
+                        setTimeout(() => {
+                            las.play();
+                        }, 100);
+                        las.pause();
+                    }, 7500);
+                    setTimeout(() => {
+                        im.style.visibility='visible';
+                        obs.style.visibility='visible';
+                    }, 8000);
+                    setTimeout(() => {
+                        im.style.visibility='hidden';
+                        obs.style.visibility='hidden';
+                        setTimeout(() => {
+                            las.play();
+                        }, 100);
+                        las.pause();
+                    }, 8500);
+                    setTimeout(() => {
+                        im.style.visibility='visible';
+                        obs.style.visibility='visible';
+                    }, 9000);
+                    setTimeout(() => {
+                        im.style.visibility='hidden';
+                        obs.style.visibility='hidden';
+                        setTimeout(() => {
+                            las.play();
+                        }, 100);
+                        las.pause();
+                    }, 9500);
+                    setTimeout(() => {
+                        im.style.visibility='visible';
+                        obs.style.visibility='visible';
+                    }, 10000);
+                    
+            }
+           
+        }
+    }, 10);
+    
+    function updatesc(s) {
+        score.innerHTML = "SCORE : " + s;
+    }
+
+
+</script>
+
+</html>
